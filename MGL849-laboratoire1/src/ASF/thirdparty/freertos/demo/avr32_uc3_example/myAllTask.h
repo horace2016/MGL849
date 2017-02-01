@@ -171,5 +171,6 @@ static void powerLed(void)
 
 /*           Calcul de la puissance */
 static int calculateRequiredPower(void){
-	return (int)(((double) (orderTemperature - currentTemperature) / 6) * 100);
+	int power = (int)(((double) (orderTemperature - currentTemperature) / 6) * 100);
+	return power >= 0 ? power : 0;
 }
