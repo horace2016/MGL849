@@ -85,7 +85,7 @@ static void vTaskReadADC(void *pvParameters){
 		 }
 		 
 	    /*--- convert hex value potentiometer to cellsius ----*/
-	    temps_pot = 5 + adc_value_pot * 30/1024;		 
+	    temps_pot = 5 + adc_value_pot * 26/1024;		 
 		 
 		 // See if we can obtain the semaphore.
 		 
