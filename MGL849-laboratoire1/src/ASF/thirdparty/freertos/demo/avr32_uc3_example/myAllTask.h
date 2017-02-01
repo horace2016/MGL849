@@ -1,15 +1,6 @@
 
 //#include "dip204.h"
 
-
-
-#define LED0_LED1_ON                      LED_Off(LED0); LED_Off(LED1);LED_Off(LED2);LED_Off(LED3);LED_Off(LED4);LED_Off(LED5);LED_Off(LED6)
-#define LED0_LED1_LED2_ON                 LED_On(LED0); LED_Off(LED1);LED_Off(LED2);LED_Off(LED3);LED_Off(LED4);LED_Off(LED5);LED_Off(LED6)
-#define LED0_LED1_LED2_LED3_ON            LED_On(LED0); LED_On(LED1);LED_Off(LED2);LED_Off(LED3);LED_Off(LED4);LED_Off(LED5);LED_Off(LED6)
-#define LED0_LED1_LED2_LED3_LED4_ON       LED_On(LED0); LED_On(LED1);LED_On(LED2);LED_Off(LED3);LED_Off(LED4);LED_Off(LED5);LED_Off(LED6)
-#define LED0_LED1_LED2_LED3_LED4_LED5_ON  LED_On(LED0); LED_On(LED1);LED_On(LED2);LED_On(LED3);LED_On(LED4);LED_On(LED5);LED_On(LED6)
-
-
 volatile unsigned short compteur = 0;
 volatile int short power = 0;
 
@@ -149,19 +140,15 @@ static void vTaskLedPOWER( void *pvParameters ){
 /************************************************/
 static void powerLed(void)
 {
-		if(power < 0 ) {LED0_LED1_ON;}
-		else{
-			if(power < 25  ) {LED0_LED1_LED2_ON;}
-			else{
-				if(power < 50  ) {LED0_LED1_LED2_LED3_ON;}
-				else{
-					if(power < 75 ) {LED0_LED1_LED2_LED3_LED4_ON;}
-					else{
-						if(power < 100 ) {LED0_LED1_LED2_LED3_LED4_LED5_ON;}
-					}
-				}
-			}
-		}
+	int i;
+	int step = 100 / LED_COUNT;
+	uint32_t value = 0; // One bit per led (8 leds)
+	for (i=0;i<LED_COUNT;i++) {
+		if (power > i*step)
+			value |= 1 << i; // Set led's bit to '1' if power exceeds led's "value"
+	}
+
+	LED_Display(value);
 }
 
 /*           Calcul de la puissance */
