@@ -16,8 +16,8 @@ volatile int short power = 0;
 
 /* Priority of task */
 #define READ_ADC_PRIORITY   4 //(tskIDLE_PRIORITY + 1 ) //(tskIDLE_PRIORITY + 1 ) //( 4)
-#define LCD_REFRESH_PRIORITY 4 //(tskIDLE_PRIORITY + 1 ) //tskIDLE_PRIORITY + 1  //(4)
-#define TRAITEMENT_PRIORITY 4 // (tskIDLE_PRIORITY + 1 ) //skIDLE_PRIORITY + 1  //(4)
+#define LCD_REFRESH_PRIORITY 3 //(tskIDLE_PRIORITY + 1 ) //tskIDLE_PRIORITY + 1  //(4)
+#define TRAITEMENT_PRIORITY 2 // (tskIDLE_PRIORITY + 1 ) //skIDLE_PRIORITY + 1  //(4)
 
 /* Identifiant des taches */
 volatile xTaskHandle *id_vTaskReadADC ;
@@ -28,6 +28,7 @@ static void vTaskReadADC( void *pvParameters );
 static void vTaskRefreshLCD( void *pvParameters );
 static void vTaskLedPOWER( void *pvParameters );
 
+static void clearLCD(void);
 static int calculateRequiredPower(void);
 static void powerLed(void);
 
@@ -59,6 +60,7 @@ static void vTaskReadADC(void *pvParameters){
 	
 	int temps_cel=0;
 	int temps_pot=0;
+	int power_percent=0;
 	int index = 0;
 	
 	for (;;)
@@ -87,19 +89,19 @@ static void vTaskReadADC(void *pvParameters){
 	    /*--- convert hex value potentiometer to cellsius ----*/
 	    temps_pot = 5 + adc_value_pot * 26/1024;		 
 		 
+		 /* Get power */
+		 power_percent = calculateRequiredPower();
 		 // See if we can obtain the semaphore.
 		 
 		 if( xSemaphoreTake( SYNCHRO_SEMAPHORE,  portMAX_DELAY ) == 1 )
 		 {
 			 currentTemperature = temps_cel;
 			 orderTemperature   = temps_pot;
-			// LED_Toggle(LED5);
-			 power = calculateRequiredPower();			 	
+			 power = power_percent;			 	
 			 xSemaphoreGive( SYNCHRO_SEMAPHORE );
-			 vTaskDelay(100);
-		 }
-			
-		vTaskPrioritySet(*id_vTaskRefreshLCD, 5);
+			vTaskDelay(100);
+		}
+		vTaskPrioritySet(*id_vTaskRefreshLCD, READ_ADC_PRIORITY + 1);
 	}
 }
 
@@ -120,14 +122,14 @@ static void vTaskRefreshLCD( void *pvParameters ){
 	for (;;)
 	{
 		clearLCD();
-		dip204_set_cursor_position(17,1);
+		dip204_set_cursor_position(16,1);
 		dip204_printf_string("%d", orderTemperature);
-		dip204_set_cursor_position(17,2);
+		dip204_set_cursor_position(16,2);
 		dip204_printf_string("%d", currentTemperature);
-		dip204_set_cursor_position(17,3);
+		dip204_set_cursor_position(16,3);
 		dip204_printf_string("%d", power);
-//		vTaskDelay(100); 
-//		vTaskPrioritySet(*id_vTaskLedPOWER, 6);
+		vTaskDelay(100);
+		vTaskPrioritySet(*id_vTaskLedPOWER, LCD_REFRESH_PRIORITY + 1);
 	}
 }
 
@@ -138,9 +140,9 @@ static void vTaskLedPOWER( void *pvParameters ){
 	for (;;)
 	{
 		powerLed();		
-		vTaskPrioritySet(*id_vTaskReadADC, 4);
-		vTaskPrioritySet(*id_vTaskLedPOWER, 4);
-		vTaskPrioritySet(*id_vTaskRefreshLCD, 4);
+		vTaskPrioritySet(*id_vTaskReadADC, READ_ADC_PRIORITY);
+		vTaskPrioritySet(*id_vTaskRefreshLCD, LCD_REFRESH_PRIORITY);
+		vTaskPrioritySet(*id_vTaskLedPOWER, TRAITEMENT_PRIORITY);
 	}
 }
 
