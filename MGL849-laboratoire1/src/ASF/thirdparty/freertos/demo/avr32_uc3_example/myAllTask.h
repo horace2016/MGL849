@@ -103,6 +103,15 @@ static void vTaskReadADC(void *pvParameters){
 	}
 }
 
+static void clearLCD(){
+	dip204_set_cursor_position(14,1);
+	dip204_write_string("      ");
+	dip204_set_cursor_position(12,2);
+	dip204_write_string("        ");
+	dip204_set_cursor_position(7,3);
+	dip204_write_string("             ");
+}
+
 /*!
 *
 */
@@ -110,31 +119,15 @@ static void vTaskRefreshLCD( void *pvParameters ){
 
 	for (;;)
 	{
-		dip204_clear_display();
-		dip204_set_cursor_position(1,1);
-		dip204_write_string("Temp. target: ");
-		dip204_set_cursor_position(14,1);
-		dip204_write_string(" ");
+		clearLCD();
+		dip204_set_cursor_position(17,1);
 		dip204_printf_string("%d", orderTemperature);
-		dip204_set_cursor_position(18,1);
-		dip204_write_string("C");
-		dip204_set_cursor_position(1,2);
-		dip204_write_string("Temp. room: ");
-		dip204_set_cursor_position(12,2);
-		dip204_write_string("   ");
+		dip204_set_cursor_position(17,2);
 		dip204_printf_string("%d", currentTemperature);
-		dip204_set_cursor_position(18,2);
-		dip204_write_string("C");
-		dip204_set_cursor_position(1,3);
-		dip204_write_string("Power: ");
-		dip204_set_cursor_position(7,3);
-		dip204_write_string("      ");
+		dip204_set_cursor_position(17,3);
 		dip204_printf_string("%d", power);
-		dip204_set_cursor_position(18,3);
-		dip204_write_string("%");
-		dip204_hide_cursor();
-		vTaskDelay(100); 
-		vTaskPrioritySet(*id_vTaskLedPOWER, 6);
+//		vTaskDelay(100); 
+//		vTaskPrioritySet(*id_vTaskLedPOWER, 6);
 	}
 }
 

@@ -67,6 +67,22 @@ void initializeLCD(void){
 	  
 	  // initialize LCD
 	  dip204_init(backlight_PWM, true);
+
+	dip204_clear_display();
+	dip204_set_cursor_position(1,1);
+	dip204_write_string("Temp. target: ");
+	dip204_set_cursor_position(20,1);
+	dip204_write_string("C");
+	dip204_set_cursor_position(1,2);
+	dip204_write_string("Temp. room: ");
+	dip204_set_cursor_position(20,2);
+	dip204_write_string("C");
+	dip204_set_cursor_position(1,3);
+	dip204_write_string("Power: ");
+	dip204_set_cursor_position(20,3);
+	dip204_write_string("%");
+	dip204_hide_cursor();
+
 }
 
 
