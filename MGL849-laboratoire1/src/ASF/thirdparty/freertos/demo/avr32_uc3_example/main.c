@@ -1,22 +1,20 @@
 
 /************************************************************************/
-/* MGL849 Laboratoire 1 squelette                                       */
+/* MGL849 Laboratoire 1                                                 */
 /* Noms et Code permanent des etudiants:                                */
 /* GANDJI Horace -                                                      */
 /* BOUFFARD Nicolas - BOUN15039408                                      */
 /************************************************************************/
 
-
+/* Standard header files */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-
 /* Environment header files. */
 #include "asf.h"
-#include "laboMGL849.h"
-#include "myAllTask.h"
-
+#include "project_utils.h"
+#include "project_tasks.h"
 
 int main(void) {
 
@@ -26,30 +24,30 @@ int main(void) {
     //pcl_switch_to_osc(PCL_OSC0, FOSC0, OSC0_STARTUP);
     pm_switch_to_osc0(&AVR32_PM, FOSC0, OSC0_STARTUP);
 
-    /* Initialisation de l'ADC*/
+    /* Initialize ADC */
     initializeADC();
 
-    /* Initialisation du LCD*/
+    /* Initialize LCD */
     initializeLCD();
 
-    // Initialize your semaphore
+    /* Initialize semaphore */
     SYNCHRO_SEMAPHORE = xSemaphoreCreateMutex();
 
     if (!(pdPASS == xTaskCreate(vTaskReadADC, (signed char *) "Lecture ADC", 200, NULL, READ_ADC_PRIORITY,
                                 (xTaskHandle *) id_vTaskReadADC)))
         goto hell;
-    if (!(pdPASS == xTaskCreate(vTaskRefreshLCD, (signed char *) "Task afficage", 5000, NULL, LCD_REFRESH_PRIORITY,
+    if (!(pdPASS == xTaskCreate(vTaskRefreshLCD, (signed char *) "Task afficage", 5000, NULL, REFRESH_LCD_PRIORITY,
                                 (xTaskHandle *) id_vTaskRefreshLCD)))
         goto hell;
-    if (!(pdPASS == xTaskCreate(vTaskLedPOWER, (signed char *) "Task LED", 2000, NULL, TRAITEMENT_PRIORITY,
-                                (xTaskHandle *) id_vTaskLedPOWER)))
+    if (!(pdPASS == xTaskCreate(vTaskPowerLEDs, (signed char *) "Task LED", 2000, NULL, TRAITEMENT_PRIORITY,
+                                (xTaskHandle *) id_vTaskPowerLEDs)))
         goto hell;
 
     /* Start the scheduler. */
     vTaskStartScheduler();
 
     hell:
-    /* Will only get here if there was insufficient memory to create the idle
-    task. */
+
+    /* Will only get here if there was insufficient memory to create the idle task. */
     return 0;
 }

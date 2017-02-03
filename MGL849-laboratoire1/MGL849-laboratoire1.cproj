@@ -829,13 +829,13 @@
     <None Include="src\ASF\common\services\delay\delay.h">
       <SubType>compile</SubType>
     </None>
-    <Compile Include="src\ASF\thirdparty\freertos\demo\avr32_uc3_example\laboMGL849.h">
+    <Compile Include="src\ASF\thirdparty\freertos\demo\avr32_uc3_example\project_utils.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\ASF\thirdparty\freertos\demo\avr32_uc3_example\main.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\ASF\thirdparty\freertos\demo\avr32_uc3_example\myAllTask.h">
+    <Compile Include="src\ASF\thirdparty\freertos\demo\avr32_uc3_example\project_tasks.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\ASF\thirdparty\freertos\demo\common\minimal\AltBlckQ.c">
