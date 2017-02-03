@@ -45,7 +45,9 @@ static int compute_power(void);
 static void power_LEDs(void);
 
 /* Semaphore */
-static xSemaphoreHandle SYNCHRO_SEMAPHORE = NULL;
+static xSemaphoreHandle SEMAPHORE_TEMP_ROOM = NULL;
+static xSemaphoreHandle SEMAPHORE_TEMP_TARGET = NULL;
+static xSemaphoreHandle SEMAPHORE_POWER = NULL;
 
 const unsigned short temperature_code[] = {
         0x3B4, 0x3B0, 0x3AB, 0x3A6, 0x3A0, 0x39A, 0x394, 0x38E, 0x388, 0x381, 0x37A, 0x373,
@@ -76,9 +78,9 @@ static void vTaskReadADCPotentiometer(void *pvParameters) {
 		convert_potentiometer_hex_to_celsius(&temp_target_celsius);
 
         /* See if we can obtain the semaphore */
-        if (xSemaphoreTake(SYNCHRO_SEMAPHORE, portMAX_DELAY) == 1) {
+        if (xSemaphoreTake(SEMAPHORE_TEMP_TARGET, portMAX_DELAY) == 1) {
             temp_target = temp_target_celsius;
-            xSemaphoreGive(SYNCHRO_SEMAPHORE);
+            xSemaphoreGive(SEMAPHORE_TEMP_TARGET);
             vTaskDelay(100);
         }
 
@@ -101,9 +103,9 @@ static void vTaskReadADCSensor(void *pvParameters) {
 		convert_sensor_hex_to_celsius(&temp_room_celsius);
 
 		/* See if we can obtain the semaphore */
-		if (xSemaphoreTake(SYNCHRO_SEMAPHORE, portMAX_DELAY) == 1) {
+		if (xSemaphoreTake(SEMAPHORE_TEMP_ROOM, portMAX_DELAY) == 1) {
 			temp_room = temp_room_celsius;
-			xSemaphoreGive(SYNCHRO_SEMAPHORE);
+			xSemaphoreGive(SEMAPHORE_TEMP_ROOM);
 			vTaskDelay(100);
 		}
 
@@ -120,9 +122,9 @@ static void vTaskComputePower(void *pvParameters) {
 		power_percent = compute_power();
 
 		/* See if we can obtain the semaphore */
-		if (xSemaphoreTake(SYNCHRO_SEMAPHORE, portMAX_DELAY) == 1) {
+		if (xSemaphoreTake(SEMAPHORE_POWER, portMAX_DELAY) == 1) {
 			power = power_percent;
-			xSemaphoreGive(SYNCHRO_SEMAPHORE);
+			xSemaphoreGive(SEMAPHORE_POWER);
 			vTaskDelay(100);
 		}
 
@@ -135,11 +137,20 @@ static void vTaskRefreshLCD(void *pvParameters) {
     for (;;) {
         clear_LCD();
         dip204_set_cursor_position(16, 1);
-        dip204_printf_string("%d", temp_target);
+		if (xSemaphoreTake(SEMAPHORE_TEMP_TARGET, portMAX_DELAY) == 1) {
+	        dip204_printf_string("%d", temp_target);
+			xSemaphoreGive(SEMAPHORE_TEMP_TARGET);
+		}
         dip204_set_cursor_position(16, 2);
-        dip204_printf_string("%d", temp_room);
+		if (xSemaphoreTake(SEMAPHORE_TEMP_ROOM, portMAX_DELAY) == 1) {
+	        dip204_printf_string("%d", temp_room);
+			xSemaphoreGive(SEMAPHORE_TEMP_ROOM);
+		}
         dip204_set_cursor_position(16, 3);
-        dip204_printf_string("%d", power);
+		if (xSemaphoreTake(SEMAPHORE_POWER, portMAX_DELAY) == 1) {
+	        dip204_printf_string("%d", power);
+			xSemaphoreGive(SEMAPHORE_POWER);
+		}
         vTaskDelay(100);
         vTaskPrioritySet(*id_vTaskPowerLEDs, REFRESH_LCD_PRIORITY + 1);
     }

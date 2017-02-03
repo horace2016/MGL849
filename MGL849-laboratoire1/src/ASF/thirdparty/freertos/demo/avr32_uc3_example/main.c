@@ -30,8 +30,10 @@ int main(void) {
     /* Initialize LCD */
     initializeLCD();
 
-    /* Initialize semaphore */
-    SYNCHRO_SEMAPHORE = xSemaphoreCreateMutex();
+    /* Initialize semaphores */
+    SEMAPHORE_TEMP_TARGET = xSemaphoreCreateMutex();
+    SEMAPHORE_TEMP_ROOM = xSemaphoreCreateMutex();
+    SEMAPHORE_POWER = xSemaphoreCreateMutex();
 
     if (!(pdPASS == xTaskCreate(vTaskReadADCPotentiometer, (signed char *) "Read ADC Potentiometer", 200, NULL, READ_ADC_POTENTIOMETER_PRIORITY,
                                 (xTaskHandle *) id_vTaskReadADCPotentiometer)))
