@@ -33,13 +33,19 @@ int main(void) {
     /* Initialize semaphore */
     SYNCHRO_SEMAPHORE = xSemaphoreCreateMutex();
 
-    if (!(pdPASS == xTaskCreate(vTaskReadADC, (signed char *) "Lecture ADC", 200, NULL, READ_ADC_PRIORITY,
-                                (xTaskHandle *) id_vTaskReadADC)))
+    if (!(pdPASS == xTaskCreate(vTaskReadADCPotentiometer, (signed char *) "Read ADC Potentiometer", 200, NULL, READ_ADC_POTENTIOMETER_PRIORITY,
+                                (xTaskHandle *) id_vTaskReadADCPotentiometer)))
         goto hell;
-    if (!(pdPASS == xTaskCreate(vTaskRefreshLCD, (signed char *) "Task afficage", 5000, NULL, REFRESH_LCD_PRIORITY,
+    if (!(pdPASS == xTaskCreate(vTaskReadADCSensor, (signed char *) "Read ADC Sensor", 200, NULL, READ_ADC_SENSOR_PRIORITY,
+							    (xTaskHandle *) id_vTaskReadADCSensor)))
+    goto hell;
+	if (!(pdPASS == xTaskCreate(vTaskComputePower, (signed char *) "Compute Power", 200, NULL, COMPUTE_POWER_PRIORITY,
+								(xTaskHandle *) id_vTaskComputePower)))
+	goto hell;
+    if (!(pdPASS == xTaskCreate(vTaskRefreshLCD, (signed char *) "Refresh LCD", 5000, NULL, REFRESH_LCD_PRIORITY,
                                 (xTaskHandle *) id_vTaskRefreshLCD)))
         goto hell;
-    if (!(pdPASS == xTaskCreate(vTaskPowerLEDs, (signed char *) "Task LED", 2000, NULL, TRAITEMENT_PRIORITY,
+    if (!(pdPASS == xTaskCreate(vTaskPowerLEDs, (signed char *) "Power LEDs", 2000, NULL, POWER_LEDS_PRIORITY,
                                 (xTaskHandle *) id_vTaskPowerLEDs)))
         goto hell;
 

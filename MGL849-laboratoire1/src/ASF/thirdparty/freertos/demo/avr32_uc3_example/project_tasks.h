@@ -7,17 +7,25 @@ volatile int short temp_target = 0;
 volatile int short power = 0;
 
 /* Tasks priorities */
-#define READ_ADC_PRIORITY 4
+#define READ_ADC_POTENTIOMETER_PRIORITY 6
+#define READ_ADC_SENSOR_PRIORITY 6
+#define COMPUTE_POWER_PRIORITY 5
 #define REFRESH_LCD_PRIORITY 3
 #define POWER_LEDS_PRIORITY 2
 
 /* Tasks IDs */
-volatile xTaskHandle *id_vTaskReadADC;
+volatile xTaskHandle *id_vTaskReadADCPotentiometer;
+volatile xTaskHandle *id_vTaskReadADCSensor;
+volatile xTaskHandle *id_vTaskComputePower;
 volatile xTaskHandle *id_vTaskRefreshLCD;
 volatile xTaskHandle *id_vTaskPowerLEDs;
 
 /* Tasks */
-static void vTaskReadADC(void *);
+static void vTaskReadADCPotentiometer(void *);
+
+static void vTaskReadADCSensor(void *);
+
+static void vTaskComputePower(void *);
 
 static void vTaskRefreshLCD(void *);
 
@@ -53,51 +61,73 @@ const unsigned short temperature_code[] = {
 
 /************************************************************************************/
 
-static void vTaskReadADC(void *pvParameters) {
+static void vTaskReadADCPotentiometer(void *pvParameters) {
 
-    int temp_room_celsius = 0;
     int temp_target_celsius = 0;
-    int power_percent = 0;
 
     for (;;) {
         /* Start conversions on all enabled channels */
         adc_start(&AVR32_ADC);
 
-        /* Get value for the temperature adc channel */
-        adc_value_temp = adc_get_value(&AVR32_ADC, ADC_TEMPERATURE_CHANNEL);
-
         /* Get value for the potentiometer adc channel */
         adc_value_pot = adc_get_value(&AVR32_ADC, ADC_POTENTIOMETER_CHANNEL);
-
-        /* Convert hex value of current temperature to Celsius */
-		convert_sensor_hex_to_celsius(&temp_room_celsius);
 
         /* Convert hex value of potentiometer to Celsius ----*/
 		convert_potentiometer_hex_to_celsius(&temp_target_celsius);
 
-        /* Compute power */
-        power_percent = compute_power();
-
         /* See if we can obtain the semaphore */
         if (xSemaphoreTake(SYNCHRO_SEMAPHORE, portMAX_DELAY) == 1) {
-            temp_room = temp_room_celsius;
             temp_target = temp_target_celsius;
-            power = power_percent;
             xSemaphoreGive(SYNCHRO_SEMAPHORE);
             vTaskDelay(100);
         }
 
-        vTaskPrioritySet(*id_vTaskRefreshLCD, READ_ADC_PRIORITY + 1);
+        vTaskPrioritySet(*id_vTaskReadADCPotentiometer, READ_ADC_POTENTIOMETER_PRIORITY - 2);
     }
 }
 
-static void clear_LCD() {
-    dip204_set_cursor_position(14, 1);
-    dip204_write_string("      ");
-    dip204_set_cursor_position(12, 2);
-    dip204_write_string("        ");
-    dip204_set_cursor_position(7, 3);
-    dip204_write_string("             ");
+static void vTaskReadADCSensor(void *pvParameters) {
+
+	int temp_room_celsius = 0;
+
+	for (;;) {
+		/* Start conversions on all enabled channels */
+		adc_start(&AVR32_ADC);
+
+		/* Get value for the temperature adc channel */
+		adc_value_temp = adc_get_value(&AVR32_ADC, ADC_TEMPERATURE_CHANNEL);
+
+		/* Convert hex value of current temperature to Celsius */
+		convert_sensor_hex_to_celsius(&temp_room_celsius);
+
+		/* See if we can obtain the semaphore */
+		if (xSemaphoreTake(SYNCHRO_SEMAPHORE, portMAX_DELAY) == 1) {
+			temp_room = temp_room_celsius;
+			xSemaphoreGive(SYNCHRO_SEMAPHORE);
+			vTaskDelay(100);
+		}
+
+        vTaskPrioritySet(*id_vTaskReadADCSensor, READ_ADC_SENSOR_PRIORITY - 2);
+	}
+}
+
+static void vTaskComputePower(void *pvParameters) {
+
+	int power_percent = 0;
+
+	for (;;) {
+		/* Compute power */
+		power_percent = compute_power();
+
+		/* See if we can obtain the semaphore */
+		if (xSemaphoreTake(SYNCHRO_SEMAPHORE, portMAX_DELAY) == 1) {
+			power = power_percent;
+			xSemaphoreGive(SYNCHRO_SEMAPHORE);
+			vTaskDelay(100);
+		}
+
+		vTaskPrioritySet(*id_vTaskRefreshLCD, COMPUTE_POWER_PRIORITY + 1);
+	}
 }
 
 static void vTaskRefreshLCD(void *pvParameters) {
@@ -116,6 +146,7 @@ static void vTaskRefreshLCD(void *pvParameters) {
 }
 
 static void vTaskPowerLEDs(void *pvParameters) {
+
     for (;;) {
         power_LEDs();
 		reset_priorities();
@@ -124,8 +155,19 @@ static void vTaskPowerLEDs(void *pvParameters) {
 
 /************************************************/
 
+static void clear_LCD() {
+	dip204_set_cursor_position(14, 1);
+	dip204_write_string("      ");
+	dip204_set_cursor_position(12, 2);
+	dip204_write_string("        ");
+	dip204_set_cursor_position(7, 3);
+	dip204_write_string("             ");
+}
+
 static void reset_priorities() {
-    vTaskPrioritySet(*id_vTaskReadADC, READ_ADC_PRIORITY);
+    vTaskPrioritySet(*id_vTaskReadADCPotentiometer, READ_ADC_POTENTIOMETER_PRIORITY);
+    vTaskPrioritySet(*id_vTaskReadADCSensor, READ_ADC_SENSOR_PRIORITY);
+    vTaskPrioritySet(*id_vTaskComputePower, COMPUTE_POWER_PRIORITY);
     vTaskPrioritySet(*id_vTaskRefreshLCD, REFRESH_LCD_PRIORITY);
     vTaskPrioritySet(*id_vTaskPowerLEDs, POWER_LEDS_PRIORITY);
 }
