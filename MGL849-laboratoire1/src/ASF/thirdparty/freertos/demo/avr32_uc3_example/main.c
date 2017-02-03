@@ -1,8 +1,9 @@
 
 /************************************************************************/
 /* MGL849 Laboratoire 1 squelette                                       */
-/* Noms et Code permanent des �tudiants:                                */
-/*  Mon Nom - codepermanent                                             */
+/* Noms et Code permanent des etudiants:                                */
+/* GANDJI Horace -                                                      */
+/* BOUFFARD Nicolas - BOUN15039408                                      */
 /************************************************************************/
 
 
@@ -12,15 +13,7 @@
 
 
 /* Environment header files. */
-#include "power_clocks_lib.h"
-
-/* Scheduler header files. */
-#include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
-
-//#include "asf.h"  // horace
-#include <asf.h>
+#include "asf.h"
 #include "laboMGL849.h"
 #include "myAllTask.h"
 

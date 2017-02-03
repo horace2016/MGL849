@@ -1,5 +1,5 @@
-
-//#include "dip204.h"
+#ifndef MYALLTASK
+#define MYALLTASK
 
 volatile unsigned short compteur = 0;
 volatile int short power = 0;
@@ -152,3 +152,5 @@ static int calculateRequiredPower(void) {
     int power = (int) (((double) (orderTemperature - currentTemperature) / 6) * 100);
     return power >= 0 ? power : 0;
 }
+
+#endif /* MYALLTASK */

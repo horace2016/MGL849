@@ -1,15 +1,5 @@
-
-
-/* Connection of the temperature sensor */
-#  define ADC_TEMPERATURE_CHANNEL     0
-#  define ADC_TEMPERATURE_PIN         AVR32_ADC_AD_0_PIN
-#  define ADC_TEMPERATURE_FUNCTION    AVR32_ADC_AD_0_FUNCTION
-
-/* Connection of the potentiometer */
-#  define ADC_POTENTIOMETER_CHANNEL   1
-#  define ADC_POTENTIOMETER_PIN       AVR32_ADC_AD_1_PIN
-#  define ADC_POTENTIOMETER_FUNCTION  AVR32_ADC_AD_1_FUNCTION
-
+#ifndef LABOMGL849_H
+#define LABOMGL849_H
 
 void initializeLCD(void);
 
@@ -113,3 +103,5 @@ void initializeADC(void) {
     adc_enable(&AVR32_ADC, ADC_TEMPERATURE_CHANNEL);
     adc_enable(&AVR32_ADC, ADC_POTENTIOMETER_CHANNEL);
 }
+
+#endif /* LABOMGL849_H */
