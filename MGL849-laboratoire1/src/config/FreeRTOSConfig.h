@@ -65,14 +65,14 @@
 #define configUSE_IDLE_HOOK       0
 #define configUSE_TICK_HOOK       0
 #if (BOARD == UC3L_EK)
-	#define EXAMPLE_TARGET_MCUCLK_FREQ_HZ   12000000  // MCU clock target frequency, in Hz
-	#define EXAMPLE_TARGET_PBACLK_FREQ_HZ   12000000  // PBA clock target frequency, in Hz
+#define EXAMPLE_TARGET_MCUCLK_FREQ_HZ   12000000  // MCU clock target frequency, in Hz
+#define EXAMPLE_TARGET_PBACLK_FREQ_HZ   12000000  // PBA clock target frequency, in Hz
 
-	#define configCPU_CLOCK_HZ        ( EXAMPLE_TARGET_MCUCLK_FREQ_HZ ) /* Hz clk gen */
-	#define configPBA_CLOCK_HZ        ( EXAMPLE_TARGET_PBACLK_FREQ_HZ )
+#define configCPU_CLOCK_HZ        ( EXAMPLE_TARGET_MCUCLK_FREQ_HZ ) /* Hz clk gen */
+#define configPBA_CLOCK_HZ        ( EXAMPLE_TARGET_PBACLK_FREQ_HZ )
 #else
-	#define configCPU_CLOCK_HZ        ( FOSC0 ) /* Hz clk gen */
-	#define configPBA_CLOCK_HZ        ( FOSC0 )
+#define configCPU_CLOCK_HZ        ( FOSC0 ) /* Hz clk gen */
+#define configPBA_CLOCK_HZ        ( FOSC0 )
 #endif
 #define configTICK_RATE_HZ        ( ( portTickType ) 1000 )
 #define configMAX_PRIORITIES      ( ( unsigned portBASE_TYPE ) 8 )
@@ -113,9 +113,9 @@ to exclude the API function. */
    0xA5 in order to be able to determine the maximal heap consumption. */
 #define configHEAP_INIT               0
 
- #define configUSE_MUTEXES                   1
+#define configUSE_MUTEXES                   1
 // #define configUSE_RECURSIVE_MUTEXES         0
- #define configUSE_COUNTING_SEMAPHORES       1
+#define configUSE_COUNTING_SEMAPHORES       1
 // #define configUSE_ALTERNATIVE_API           0
 // #define configCHECK_FOR_STACK_OVERFLOW      0
 // #define configQUEUE_REGISTRY_SIZE           10

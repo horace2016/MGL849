@@ -1,7 +1,7 @@
 
 /************************************************************************/
 /* MGL849 Laboratoire 1 squelette                                       */
-/* Noms et Code permanent des étudiants:                                */
+/* Noms et Code permanent des ï¿½tudiants:                                */
 /*  Mon Nom - codepermanent                                             */
 /************************************************************************/
 
@@ -25,33 +25,38 @@
 #include "myAllTask.h"
 
 
-int main( void )
-{
+int main(void) {
 
-	// Configure Osc0 in crystal mode (i.e. use of an external crystal source, with
-	// frequency FOSC0 (12Mhz) ) with an appropriate startup time then switch the main clock
-	// source to Osc0.
-	//pcl_switch_to_osc(PCL_OSC0, FOSC0, OSC0_STARTUP);
-	pm_switch_to_osc0(&AVR32_PM, FOSC0, OSC0_STARTUP);
-	
-	/* Initialisation de l'ADC*/
-	initializeADC();
-	
-	/* Initialisation du LCD*/	
-	initializeLCD();
-	
-	// Initialize your semaphore
-	SYNCHRO_SEMAPHORE  =  xSemaphoreCreateMutex ( );
+    // Configure Osc0 in crystal mode (i.e. use of an external crystal source, with
+    // frequency FOSC0 (12Mhz) ) with an appropriate startup time then switch the main clock
+    // source to Osc0.
+    //pcl_switch_to_osc(PCL_OSC0, FOSC0, OSC0_STARTUP);
+    pm_switch_to_osc0(&AVR32_PM, FOSC0, OSC0_STARTUP);
 
-	if(!( pdPASS == xTaskCreate( vTaskReadADC,    ( signed char * ) "Lecture ADC",    200,  NULL, READ_ADC_PRIORITY,  (xTaskHandle*)  id_vTaskReadADC    ))) goto hell;   
-	if(!( pdPASS == xTaskCreate( vTaskRefreshLCD, ( signed char * ) "Task afficage",  5000, NULL, LCD_REFRESH_PRIORITY, (xTaskHandle*) id_vTaskRefreshLCD ))) goto hell;
-	if(!( pdPASS == xTaskCreate( vTaskLedPOWER,   ( signed char * ) "Task LED",        2000,  NULL, TRAITEMENT_PRIORITY,  (xTaskHandle*) id_vTaskLedPOWER )))  goto hell;
-		
-	/* Start the scheduler. */
-	vTaskStartScheduler();
+    /* Initialisation de l'ADC*/
+    initializeADC();
 
-	hell:
-	/* Will only get here if there was insufficient memory to create the idle
-	task. */
-	return 0;
+    /* Initialisation du LCD*/
+    initializeLCD();
+
+    // Initialize your semaphore
+    SYNCHRO_SEMAPHORE = xSemaphoreCreateMutex();
+
+    if (!(pdPASS == xTaskCreate(vTaskReadADC, (signed char *) "Lecture ADC", 200, NULL, READ_ADC_PRIORITY,
+                                (xTaskHandle *) id_vTaskReadADC)))
+        goto hell;
+    if (!(pdPASS == xTaskCreate(vTaskRefreshLCD, (signed char *) "Task afficage", 5000, NULL, LCD_REFRESH_PRIORITY,
+                                (xTaskHandle *) id_vTaskRefreshLCD)))
+        goto hell;
+    if (!(pdPASS == xTaskCreate(vTaskLedPOWER, (signed char *) "Task LED", 2000, NULL, TRAITEMENT_PRIORITY,
+                                (xTaskHandle *) id_vTaskLedPOWER)))
+        goto hell;
+
+    /* Start the scheduler. */
+    vTaskStartScheduler();
+
+    hell:
+    /* Will only get here if there was insufficient memory to create the idle
+    task. */
+    return 0;
 }

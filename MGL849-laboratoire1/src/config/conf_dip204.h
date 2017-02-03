@@ -64,7 +64,7 @@
 !defined(DIP204_SPI_MOSI_PIN)      || \
 !defined(DIP204_SPI_MOSI_FUNCTION) || \
 !defined(DIP204_SPI_NPCS_PIN)      || \
-!defined(DIP204_SPI_NPCS_FUNCTION) 
+!defined(DIP204_SPI_NPCS_FUNCTION)
 #  if UC3A
 #    define DIP204_SPI                  (&AVR32_SPI1)
 #    define DIP204_SPI_NPCS             1
