@@ -1,106 +1,37 @@
 #ifndef PROJECT_UTILS_H
 #define PROJECT_UTILS_H
 
+/* Methods */
 void initializeLCD(void);
 
 void initializeADC(void);
 
-/************************************************************************************/
+void clear_LCD(void);
 
-volatile signed short adc_value_pot = -1;
-volatile signed short adc_value_temp = -1;
+void reset_priorities(void);
 
-void initializeLCD(void) {
+void convert_sensor_hex_to_celsius(int *);
 
-    static const gpio_map_t DIP204_SPI_GPIO_MAP =
-            {
-                    {DIP204_SPI_SCK_PIN,  DIP204_SPI_SCK_FUNCTION},  // SPI Clock.
-                    {DIP204_SPI_MISO_PIN, DIP204_SPI_MISO_FUNCTION},  // MISO.
-                    {DIP204_SPI_MOSI_PIN, DIP204_SPI_MOSI_FUNCTION},  // MOSI.
-                    {DIP204_SPI_NPCS_PIN, DIP204_SPI_NPCS_FUNCTION}   // Chip Select NPCS.
-            };
+void convert_potentiometer_hex_to_celsius(int *);
 
-    // Disable all interrupts
-    Disable_global_interrupt();
+int compute_power(void);
 
-    Enable_global_interrupt();
+void power_LEDs(void);
 
-    // Add the spi options driver structure for the LCD DIP204
-    spi_options_t spiOptions =
-            {
-                    .reg    = DIP204_SPI_NPCS,
-                    .baudrate    = 1000000,
-                    .bits        = 8,
-                    .spck_delay    = 0,
-                    .stay_act    = 1,
-                    .trans_delay = 8,
-                    .spi_mode    = 0,
-                    .modfdis    = 1
-            };
-    // Assign I/Os to SPI
-    gpio_enable_module(DIP204_SPI_GPIO_MAP, sizeof(DIP204_SPI_GPIO_MAP) / sizeof(DIP204_SPI_GPIO_MAP[0]));
+/* Variables */
+extern volatile signed short adc_value_pot;
+extern volatile signed short adc_value_temp;
 
-    // Initialize as master
-    spi_initMaster(DIP204_SPI, &spiOptions);
-
-    // Set selection mode: variable_ps, pcs_decode, delay
-    spi_selectionMode(DIP204_SPI, 0, 0, 0);
-
-    // Enable SPI
-    spi_enable(DIP204_SPI);
-
-    // Setup chip registers
-    spi_setupChipReg(DIP204_SPI, &spiOptions, FOSC0);
-
-    // Initialize delay driver
-    delay_init(FOSC0);
-
-    // Initialize LCD
-    dip204_init(backlight_PWM, true);
-
-    dip204_clear_display();
-    dip204_set_cursor_position(1, 1);
-    dip204_write_string("Temp. target: ");
-    dip204_set_cursor_position(20, 1);
-    dip204_write_string("C");
-    dip204_set_cursor_position(1, 2);
-    dip204_write_string("Temp. room: ");
-    dip204_set_cursor_position(20, 2);
-    dip204_write_string("C");
-    dip204_set_cursor_position(1, 3);
-    dip204_write_string("Power: ");
-    dip204_set_cursor_position(20, 3);
-    dip204_write_string("%");
-    dip204_hide_cursor();
-
-}
-
-
-void initializeADC(void) {
-
-    /** GPIO pin/adc-function map. */
-    const gpio_map_t ADC_GPIO_MAP = {
-            {ADC_TEMPERATURE_PIN,   ADC_TEMPERATURE_FUNCTION},
-            {ADC_POTENTIOMETER_PIN, ADC_POTENTIOMETER_FUNCTION}
-    };
-
-    /* Init system clocks */
-    sysclk_init();
-
-    /* Assign and enable GPIO pins to the ADC function. */
-    gpio_enable_module(ADC_GPIO_MAP, sizeof(ADC_GPIO_MAP) /
-                                     sizeof(ADC_GPIO_MAP[0]));
-
-    /* Configure the ADC peripheral module.
-     * Lower the ADC clock to match the ADC characteristics (because we
-     * configured the CPU clock to 12MHz, and the ADC clock characteristics are
-     *  usually lower; cf. the ADC Characteristic section in the datasheet). */
-    AVR32_ADC.mr |= 0x1 << AVR32_ADC_MR_PRESCAL_OFFSET;
-    adc_configure(&AVR32_ADC);
-
-    /* Enable the ADC channels. */
-    adc_enable(&AVR32_ADC, ADC_TEMPERATURE_CHANNEL);
-    adc_enable(&AVR32_ADC, ADC_POTENTIOMETER_CHANNEL);
-}
+static const unsigned short temperature_code[] = {
+	0x3B4, 0x3B0, 0x3AB, 0x3A6, 0x3A0, 0x39A, 0x394, 0x38E, 0x388, 0x381, 0x37A, 0x373,
+	0x36B, 0x363, 0x35B, 0x353, 0x34A, 0x341, 0x338, 0x32F, 0x325, 0x31B, 0x311, 0x307,
+	0x2FC, 0x2F1, 0x2E6, 0x2DB, 0x2D0, 0x2C4, 0x2B8, 0x2AC, 0x2A0, 0x294, 0x288, 0x27C,
+	0x26F, 0x263, 0x256, 0x24A, 0x23D, 0x231, 0x225, 0x218, 0x20C, 0x200, 0x1F3, 0x1E7,
+	0x1DB, 0x1CF, 0x1C4, 0x1B8, 0x1AC, 0x1A1, 0x196, 0x18B, 0x180, 0x176, 0x16B, 0x161,
+	0x157, 0x14D, 0x144, 0x13A, 0x131, 0x128, 0x11F, 0x117, 0x10F, 0x106, 0xFE, 0xF7,
+	0xEF, 0xE8, 0xE1, 0xDA, 0xD3, 0xCD, 0xC7, 0xC0, 0xBA, 0xB5, 0xAF, 0xAA, 0xA4, 0x9F,
+	0x9A, 0x96, 0x91, 0x8C, 0x88, 0x84, 0x80, 0x7C, 0x78, 0x74, 0x71, 0x6D, 0x6A, 0x67,
+	0x64, 0x61, 0x5E, 0x5B, 0x58, 0x55, 0x53, 0x50, 0x4E, 0x4C, 0x49, 0x47, 0x45, 0x43,
+0x41, 0x3F, 0x3D, 0x3C, 0x3A, 0x38};
 
 #endif /* PROJECT_UTILS_H */

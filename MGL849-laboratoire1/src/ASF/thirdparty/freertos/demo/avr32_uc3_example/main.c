@@ -16,6 +16,10 @@
 #include "project_utils.h"
 #include "project_tasks.h"
 
+volatile xSemaphoreHandle SEMAPHORE_TEMP_ROOM = NULL;
+volatile xSemaphoreHandle SEMAPHORE_TEMP_TARGET = NULL;
+volatile xSemaphoreHandle SEMAPHORE_POWER = NULL;
+
 int main(void) {
 
     // Configure Osc0 in crystal mode (i.e. use of an external crystal source, with

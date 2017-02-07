@@ -829,6 +829,12 @@
     <None Include="src\ASF\common\services\delay\delay.h">
       <SubType>compile</SubType>
     </None>
+    <Compile Include="src\ASF\thirdparty\freertos\demo\avr32_uc3_example\project_tasks.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\ASF\thirdparty\freertos\demo\avr32_uc3_example\project_utils.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\ASF\thirdparty\freertos\demo\avr32_uc3_example\project_utils.h">
       <SubType>compile</SubType>
     </Compile>
