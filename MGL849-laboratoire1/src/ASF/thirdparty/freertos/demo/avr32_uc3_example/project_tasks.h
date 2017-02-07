@@ -197,7 +197,7 @@ static void power_LEDs(void) {
 
 static int compute_power(void) {
     int power = (int) (((double) (temp_target - temp_room) / 6) * 100);
-    return power >= 0 ? power : 0;
+    return power >= 0 ? (power <= 100 ? power : 100) : 0;
 }
 
 static void convert_sensor_hex_to_celsius(int *temp_room_celsius) {
