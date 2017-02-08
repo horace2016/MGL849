@@ -34,6 +34,12 @@ int main(void) {
     SEMAPHORE_TEMP_ROOM = xSemaphoreCreateMutex();
     SEMAPHORE_POWER = xSemaphoreCreateMutex();
 
+	if ( SEMAPHORE_TEMP_TARGET == NULL || SEMAPHORE_TEMP_ROOM == NULL || SEMAPHORE_POWER == NULL )
+	{
+		goto hell;
+	}
+
+
     if (!(pdPASS == xTaskCreate(vTaskReadADCPotentiometer, (signed char *) "Read ADC Potentiometer", 200, NULL, READ_ADC_POTENTIOMETER_PRIORITY,
                                 (xTaskHandle *) id_vTaskReadADCPotentiometer)))
         goto hell;
