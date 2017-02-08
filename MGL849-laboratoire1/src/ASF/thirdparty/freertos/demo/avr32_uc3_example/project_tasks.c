@@ -33,8 +33,9 @@ void vTaskReadADCPotentiometer(void *pvParameters) {
 		if (xSemaphoreTake(SEMAPHORE_TEMP_TARGET, portMAX_DELAY) == 1) {
 			temp_target = temp_target_celsius;
 			xSemaphoreGive(SEMAPHORE_TEMP_TARGET);
-			vTaskDelay(100);
 		}
+	
+		vTaskDelay(100);
 
 		vTaskPrioritySet(*id_vTaskReadADCPotentiometer, READ_ADC_POTENTIOMETER_PRIORITY - 2);
 	}
@@ -58,8 +59,9 @@ void vTaskReadADCSensor(void *pvParameters) {
 		if (xSemaphoreTake(SEMAPHORE_TEMP_ROOM, portMAX_DELAY) == 1) {
 			temp_room = temp_room_celsius;
 			xSemaphoreGive(SEMAPHORE_TEMP_ROOM);
-			vTaskDelay(100);
 		}
+	
+		vTaskDelay(100);
 
 		vTaskPrioritySet(*id_vTaskReadADCSensor, READ_ADC_SENSOR_PRIORITY - 2);
 	}
@@ -77,8 +79,9 @@ void vTaskComputePower(void *pvParameters) {
 		if (xSemaphoreTake(SEMAPHORE_POWER, portMAX_DELAY) == 1) {
 			power = power_percent;
 			xSemaphoreGive(SEMAPHORE_POWER);
-			vTaskDelay(100);
 		}
+		
+		vTaskDelay(100);
 
 		vTaskPrioritySet(*id_vTaskRefreshLCD, COMPUTE_POWER_PRIORITY + 1);
 	}
@@ -103,7 +106,9 @@ void vTaskRefreshLCD(void *pvParameters) {
 			dip204_printf_string("%d", power);
 			xSemaphoreGive(SEMAPHORE_POWER);
 		}
+	
 		vTaskDelay(100);
+
 		vTaskPrioritySet(*id_vTaskPowerLEDs, REFRESH_LCD_PRIORITY + 1);
 	}
 }
