@@ -21,8 +21,7 @@ int main(void) {
     // Configure Osc0 in crystal mode (i.e. use of an external crystal source, with
     // frequency FOSC0 (12Mhz) ) with an appropriate startup time then switch the main clock
     // source to Osc0.
-    //pcl_switch_to_osc(PCL_OSC0, FOSC0, OSC0_STARTUP);
-    pm_switch_to_osc0(&AVR32_PM, FOSC0, OSC0_STARTUP);
+    pcl_switch_to_osc(PCL_OSC0, FOSC0, OSC0_STARTUP);
 
     /* Initialize ADC */
     initializeADC();
