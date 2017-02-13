@@ -37,7 +37,7 @@ void vTaskReadADCPotentiometer(void *pvParameters) {
 	
 		vTaskDelay(100);
 
-		vTaskPrioritySet(*id_vTaskReadADCPotentiometer, READ_ADC_POTENTIOMETER_PRIORITY - 2);
+		vTaskPrioritySet(NULL, READ_ADC_POTENTIOMETER_PRIORITY - 2);
 	}
 }
 
@@ -63,7 +63,7 @@ void vTaskReadADCSensor(void *pvParameters) {
 	
 		vTaskDelay(100);
 
-		vTaskPrioritySet(*id_vTaskReadADCSensor, READ_ADC_SENSOR_PRIORITY - 2);
+		vTaskPrioritySet(NULL, READ_ADC_SENSOR_PRIORITY - 2);
 	}
 }
 
